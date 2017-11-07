@@ -1,39 +1,27 @@
-import {
-    Component,
-    Input,
-    OnChanges
-} from '@angular/core';
-import {
-    FormControl,
-    FormGroup,
-    Validators
-} from '@angular/forms';
-
-import { Question } from '../../models';
+import { Component, OnInit, Input } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Question } from '../../models/index';
 
 @Component({
     selector: 'dynamic-form',
-    template: require('./dynamic-form.component.html')
+    template: ''
 })
-export class DynamicFormComponent implements OnChanges {
-    @Input() questions:Array<Question>;
-
+export class DynamicFormComponent implements OnInit {
     formGroup: FormGroup;
-    payload: string;
+    @Input() questions: Array<Question>;
 
-    ngOnChanges() {
+    ngOnInit() {
         this.formGroup = this.generateForm(this.questions || []);
-        this.payload = '';
     }
 
-    private generateForm(questions: Array<Question>): FormGroup {
-        const formControls = questions.reduce(this.generateControl, {});
+    generateForm(questions: Array<Question>): FormGroup {
+        const formControls = questions.reduce(this.generateControls, {});
 
         return new FormGroup(formControls);
     }
 
-    private generateControl(controls: any, question: Question) {
-        if (question.required) {
+    generateControls(controls: any, question: Question) {
+        if(question.required) {
             controls[question.id] = new FormControl(question.value || '', Validators.required);
         } else {
             controls[question.id] = new FormControl(question.value || '');
@@ -42,7 +30,4 @@ export class DynamicFormComponent implements OnChanges {
         return controls;
     }
 
-    submit() {
-        this.payload = JSON.stringify(this.formGroup.value, null, 4);
-    }
 }
